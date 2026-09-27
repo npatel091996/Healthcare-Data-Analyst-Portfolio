@@ -1,7 +1,5 @@
 # Healthcare-Data-Analyst-Portfolio
 
-# Healthcare Data Analyst Portfolio
- 
 **Niket Patel** · Healthcare Informatics Professional
  
 **Live site:** https://npatel091996.github.io/Healthcare-Data-Analyst-Portfolio/
