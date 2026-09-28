@@ -1,8 +1,7 @@
 # Clinical Trial Data Analysis – SAS
 
-**Course:** Health Data Analytics with SAS (BINF5210) · Rutgers University · Fall 2023
 **Tools:** SAS (DATA step, PROC SORT, MEANS, FREQ, CONTENTS, SGPLOT, CORR, SURVEYSELECT, UNIVARIATE, GLM)
-**Data:** `[RESTRICTED]` Primarily synthetic dataset provided by the course instructor. Stand-in data can be generated with [`data/generate_synthetic_data.py`](data/generate_synthetic_data.py).
+**Data:** `[RESTRICTED]` Primarily synthetic dataset. Stand-in data can be generated with [`data/generate_synthetic_data.py`](data/generate_synthetic_data.py).
 
 ---
 
