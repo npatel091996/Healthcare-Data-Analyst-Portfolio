@@ -1,0 +1,216 @@
+libname P1 "Project\Project SAS Library";
+
+filename project1 "Project\Data-1.csv";
+
+filename file2 "Project\Data-2.csv";
+
+
+
+* project data 1;
+data P1.PF1;
+infile project1 dlm="," dsd;
+input PatientID$ Age State$ Lenght_of_Stay Total_Charge;
+run;
+
+proc print data=P1.PF1;
+run;
+
+
+* project data 2;
+data P1.PF2;
+infile file2 dlm="," dsd;
+input PatientID$ Group$ Test_Score;
+run;
+
+proc print data=P1.PF2;
+run;
+
+
+* Total Observations;
+
+proc contents data=P1.PF1 order=varnum;
+run;
+
+proc contents data=P1.PF2 order=varnum;
+run;
+
+* Find out if any missing values 
+in both dataset  using proc mean and 
+proc freq;
+
+proc means data=P1.PF1 NMISS N ;
+run;
+	
+proc freq data=P1.PF1;
+tables State; 
+run; 
+
+proc means data=P1.PF2 NMISS N;
+run;
+
+proc freq data=P1.PF2;
+tables Group; 
+run; 
+
+
+* remove missing values;
+* file 1;
+data P1.new_PF1;
+set P1.PF1;
+if cmiss(of _all_) then delete;
+run;
+* validating that all missing values removed from file 1;
+
+proc means data=P1.new_PF1 NMISS N;
+run;
+
+Proc freq data=P1.new_PF1;
+tables State;
+run;
+
+* removing missing values and vaidating for file 2;
+
+data P1.new_PF2;
+    set P1.PF2;
+    if Group="n/a" then delete;
+	if cmiss( of _all_) then delete;
+run;
+
+*validating all mising values removed from file 2;
+proc means data=P1.new_PF2 NMISS N;
+run;
+proc freq data=P1.new_PF2;
+tables Group;
+run;
+proc print data=P1.new_PF1;
+run;
+proc print data=P1.new_PF2;
+run;
+
+* sorting and removing Duplicate values before horizontal merge;
+
+
+proc sort data=P1.new_PF1 out=P1.final_PF1 SORTSEQ =LINGUISTIC (NUMERIC_COLLATION=ON)NODUPKEY;
+by PatientID;
+run;
+proc print data=P1.final_PF1;
+run;
+
+proc sort data=P1.new_PF2 out=P1.final_PF2 SORTSEQ =LINGUISTIC (NUMERIC_COLLATION=ON)NODUPKEY;
+by PatientID;
+run;
+proc print data=P1.final_PF2;
+run;
+
+* validating the data before merge;
+proc contents data=p1.final_pf1 order=varnum;
+run;
+proc contents data=p1.final_pf2 order=varnum;
+run;
+
+* horizontal merge;
+
+data P1.merge_PF1_PF2;
+merge P1.final_PF1 (in=a) P1.final_PF2 (in=b);
+by PatientID;
+if a=1 and b=1;
+run;
+
+proc print data=P1.merge_PF1_PF2;
+run;
+
+proc means data=P1.merge_PF1_PF2 NMISS N;
+run;
+
+proc freq data=P1.merge_PF1_PF2;
+tables State Group;
+run;
+
+* Descriptive summary for continous variables in dataset;
+proc means daat=P1.merge_PF1_PF2 maxdec=2;
+run;
+*Descriptive summary of continous variables by states in datset;
+proc means data=P1.merge_PF1_PF2 maxdec=2;
+class State;
+run;
+
+* Descriptive summary for categorical variables;
+proc freq data=P1.merge_Pf1_Pf2;
+tables State Group;
+run;
+
+*Visualization;
+
+* boxplot by states;
+proc sgplot data=P1.merge_PF1_PF2;
+vbox Age / group=State ;
+run;
+proc sgplot data=P1.merge_PF1_PF2;
+vbox Lenght_of_Stay / group=State ;
+run;
+
+proc sgplot data=P1.merge_PF1_PF2;
+vbox Total_charge / group=State ;
+run;
+
+* Piechart for categorical variables;
+proc gchart data=P1.merge_PF1_PF2;
+pie State;
+run;
+
+proc gchart data=P1.merge_Pf1_PF2;
+pie Group;
+run;
+* correlation  Length of stay vs Total_Charge ;
+proc corr data=P1.merge_PF1_PF2;
+var Lenght_of_Stay Total_Charge Age;
+run;
+
+proc sgplot data=P1.merge_PF1_PF2;
+    scatter x=Lenght_of_Stay y=Total_Charge / group=State;
+	reg x=Lenght_of_Stay y=Total_Charge / nomarkers;
+run;
+
+* random sampling using srs for ANOVA;
+
+proc surveyselect 
+data=P1.merge_PF1_PF2 
+method=srs 
+sampsize=1000
+seed=8553
+out=P1.final;
+id _all_;
+run;
+
+proc print data=P1.final;
+run;
+proc sort data=P1.final out=P1.final_sort;
+by Group;
+run;
+proc print data=P1.final_sort;
+run;
+
+proc univariate data=P1.final_sort;
+var Test_Score;
+by Group;
+histogram Test_Score / normal;
+run;
+
+
+*------------------------/ ANOVA /----------------------------
+H0: There is no difference in mean test_Score between groups
+H1: There is difference in mean test_Score atleats in one group
+			Group 1: Placebo
+            Group 2: Low Dose
+            Group 3: High Dose*\;
+
+proc glm data=P1.final plot=diagnostics;
+class Group;
+Model Test_Score = Group;
+Means Group / HOVTEST;
+run;
+ 
+
+
+
+
