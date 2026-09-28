@@ -67,7 +67,7 @@ These steps use the Clinical Trial project as the example.
 **1. Clone the repository**
  
 ```bash
-git clone https://github.com/[TODO:GITHUB_USERNAME]/Healthcare-Data-Analyst-Portfolio.git
+git clone https://github.com/npatel091996/Healthcare-Data-Analyst-Portfolio.git
 cd Healthcare-Data-Analyst-Portfolio/projects/clinical-trial-sas
 ```
  
