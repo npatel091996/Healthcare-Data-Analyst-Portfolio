@@ -30,7 +30,7 @@ Healthcare-Data-Analyst-Portfolio/
 ├── assets/
 │   └── resume.pdf                      # Resume (download button on the site)
 └── projects/
-    └── clinical-trial-sas/
+    └── Clinical-Trial-Data-Analysis-Using-SAS/
         ├── README.md                   # Case study
         ├── requirements.txt            # Python libraries for the data script
         ├── code/
